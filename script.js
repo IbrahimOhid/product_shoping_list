@@ -66,8 +66,8 @@ function showProductUi(productInfo){
                 <strong>${name}</strong>- <span class="price">$${price}</span>
               </div>
               <div class="action-btn">
-                <i style='cursor: pointer' class="bi bi-pencil-square me-2 text-success"></i>
-                <i style='cursor: pointer' class="bi bi-trash3 text-danger"></i>
+                <i style='cursor: pointer' class="bi bi-pencil-square me-2 text-success editProduct"></i>
+                <i style='cursor: pointer' class="bi bi-trash3 text-danger deleteProduct"></i>
               </div>
             </li>`
             collectionElm.insertAdjacentHTML('afterbegin', elm);
@@ -87,7 +87,32 @@ function handelSubmitForm(e) {
   resetInputs();
  const product = addProduct(name, price);
  showProductUi(product);
-  console.log(name, price);
+}
+// get product id
+function getProductId(e){
+  const liElm = e.target.parentElement.parentElement;
+  const id = +liElm.getAttribute('data-productId');
+  return id;
+}
+// get product 
+function removeItem(id){
+  products = products.filter((product) => product.id !== id)
+}
+// remove id
+function removeItemFromUi(id){
+  document.querySelector(`[data-productId = "${id}"]`).remove();
+  showMessage('Product Remove Successfully', 'warning')
+}
+
+// handelManipulateProduct
+function handelManipulateProduct(e){
+  if(e.target.classList.contains('deleteProduct')){
+    // get product id
+   const id =  getProductId(e);
+   removeItem(id)
+   removeItemFromUi(id)
+  }
 }
 
 form.addEventListener("submit", handelSubmitForm);
+collectionElm.addEventListener('click', handelManipulateProduct);
