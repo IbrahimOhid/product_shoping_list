@@ -59,6 +59,10 @@ function resetInputs() {
 }
 // show product ui
 function showProductUi(productInfo) {
+  const notFoundMsg = document.querySelector('.not-found-product');
+  if(notFoundMsg){
+    notFoundMsg.remove();
+  }
   const { id, name, price } = productInfo;
   const elm = `<li
               class="list-group-item collection-item d-flex flex-row justify-content-between mb-2" data-productId = ${id}
@@ -73,18 +77,6 @@ function showProductUi(productInfo) {
             </li>`;
   collectionElm.insertAdjacentHTML("afterbegin", elm);
   showMessage("Product Added Successfully");
-}
-// add Product To Store
-function addProductToStore(product) {
-  let products;
-  if (localStorage.getItem("storeProducts")) {
-    products = JSON.parse(localStorage.getItem("storeProducts"));
-    products.push(product);
-  } else {
-    products = [];
-    products.push(product);
-  }
-  localStorage.setItem("storeProducts", JSON.stringify(products));
 }
 
 // handel submit form
@@ -126,13 +118,34 @@ function handelManipulateProduct(e) {
     const id = getProductId(e);
     removeItem(id);
     removeItemFromUi(id);
+    // remove product from store
+    removeProductFromStore(id);
   }
+}
+
+// local storage to data show 💛🧡💛
+
+// add Product To Store
+function addProductToStore(product) {
+  let products;
+  if (localStorage.getItem("storeProducts")) {
+    products = JSON.parse(localStorage.getItem("storeProducts"));
+    products.push(product);
+  } else {
+    products = [];
+    products.push(product);
+  }
+  localStorage.setItem("storeProducts", JSON.stringify(products));
 }
 
 // show all products to ui local store
 function showAllProductsToUi(products) {
-  let liElms;
-  liElms = products.length === 0 ? "<li>No products to show</li>" : "";
+  let liElms
+  liElms =
+    products.length === 0
+      ? "<li class='list-group-item not-found-product'>No Products To Show</li>"
+      : "";
+      products.sort((a,b)=> b.id - a.id);
   products.forEach((product) => {
     const { id, name, price } = product;
     liElms += `<li
@@ -146,8 +159,16 @@ function showAllProductsToUi(products) {
                 <i style='cursor: pointer' class="bi bi-trash3 text-danger deleteProduct"></i>
               </div>
             </li>`;
-    collectionElm.insertAdjacentHTML("afterbegin", liElms);
   });
+  collectionElm.insertAdjacentHTML("afterbegin", liElms);
+}
+
+// remove product from store
+function removeProductFromStore(id){
+  let products;
+  products = JSON.parse(localStorage.getItem('storeProducts'));
+  products = products.filter((product)=> product.id !== id);
+  localStorage.setItem('storeProducts', JSON.stringify(products));
 }
 
 form.addEventListener("submit", handelSubmitForm);
